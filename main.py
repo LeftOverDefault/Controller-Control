@@ -1,5 +1,5 @@
 import pygame
-import win32api, win32con
+import win32api, win32con, win32gui
 
 pygame.init()
 
@@ -20,10 +20,25 @@ SCROLL_SENSITIVITY = 20
 # Deadzone to prevent jitter
 DEADZONE = 0.1
 
+# List of apps to ignore joystick input for
+BLACKLISTED_APPS = ["Steam Big Picture Mode", "Steam"]
+
+# Function to get the active window title
+def get_active_window_title():
+    hwnd = win32gui.GetForegroundWindow()
+    return win32gui.GetWindowText(hwnd)
+
 # Main loop
 running = True
 while running:
     clock.tick(60)
+
+    # Get active window
+    active_window = get_active_window_title()
+
+    # Check if a blacklisted app is active
+    if any(app.lower() in active_window.lower() for app in BLACKLISTED_APPS):
+        continue  # Skip joystick input
 
     # Event handling for buttons and quitting
     for event in pygame.event.get():
